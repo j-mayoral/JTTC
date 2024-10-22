@@ -1,0 +1,32 @@
+Palindrome {
+    INITIAL_STATE: init
+    HALT_STATE: halt
+    STATES: (q1, q2, q3, q4, q5, q6)
+    BLANK_SYMBOL: $
+    ALPHABET: (a, b)
+    TRANSITIONS {
+        (init, $) -> (q1, $, R),
+
+        (q1, a) -> (q2, $, R),
+        (q1, b) -> (q5, $, R),
+        (q1, $) -> (halt, $, R),
+
+        (q2, a) -> (q2, a, R),
+        (q2, b) -> (q2, b, R),
+        (q2, $) -> (q3, $, L),
+
+        (q3, $) -> (halt, $, R),
+        (q3, a) -> (q4, $, L),
+
+        (q4, a) -> (q4, a, L),
+        (q4, b) -> (q4, b, L),
+        (q4, $) -> (q1, $, R),
+
+        (q5, a) -> (q5, a, R),
+        (q5, b) -> (q5, b, R),
+        (q5, $) -> (q6, $, L),
+
+        (q6, b) -> (q4, $, L),
+        (q6, $) -> (halt, $, R)
+    }
+}

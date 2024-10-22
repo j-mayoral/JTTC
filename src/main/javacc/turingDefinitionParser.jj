@@ -1,0 +1,163 @@
+options
+{
+    LOOKAHEAD=1;
+    STATIC = false;
+}
+PARSER_BEGIN(TuringMachineDefinitionParser)
+
+package org.generated;
+import org.turing2javagenerics.definition.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;import java.util.ArrayList;
+import java.util.List;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import org.turing2javagenerics.definition.*;
+
+public class TuringMachineDefinitionParser {
+  public static TuringMachineDefinition parseDef(final String source) throws ParseException {
+    TuringMachineDefinitionParser parser
+    = new TuringMachineDefinitionParser(
+      new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8)));
+    return parser.parse();
+    }
+
+  public static TuringMachineDefinition parseFile(final String source) throws ParseException, FileNotFoundException {
+    FileInputStream file = new FileInputStream(source);
+    TuringMachineDefinitionParser parser
+     = new TuringMachineDefinitionParser(file);
+    return parser.parse();
+  }
+}
+
+PARSER_END(TuringMachineDefinitionParser)
+
+SKIP : {"\n"| " " | "\r" | "\t"}
+
+TOKEN : {
+    <OPEN_DEF: "{">
+    | <CLOSE_DEF: "}">
+
+    | <INITIAL : "INITIAL_STATE">
+    | <HALT : "HALT_STATE">
+    | <STATES : "STATES">
+
+    | <BLANK : "BLANK_SYMBOL">
+    | <ALPHABET : "ALPHABET">
+
+    | <TRANSITIONS : "TRANSITIONS">
+    | <DIRECTION: ("R" | "L")>
+
+
+    | <OPEN_PAR : "(">
+    | <CLOSE_PAR : ")">
+    | <COMMA : ",">
+    | <ARROW: "->">
+
+    | <REF : (["a"-"z"] | ["A"-"Z"] |"$")+(["0"-"9"] | (["a"-"z"] | ["A"-"Z"]))*>
+}
+
+TuringMachineDefinition parse():
+    {
+String name;
+State initial;
+State halt;
+List<State> states;
+AlphabetSymbol blank;
+List<AlphabetSymbol> alphabet;
+List<Transition> transitions;
+}
+     { <REF>
+     {name = token.image;}
+     <OPEN_DEF>
+       <INITIAL> ":" initial = state()
+       <HALT> ":" halt = state()
+       <STATES> ":" <OPEN_PAR> states = parseStates(initial, halt) <CLOSE_PAR>
+       <BLANK> ":" blank = letter()
+       <ALPHABET> ":" <OPEN_PAR> alphabet = parseAlphabet(blank) <CLOSE_PAR>
+       <TRANSITIONS> <OPEN_DEF> transitions = parseTransitions() <CLOSE_DEF>
+       <CLOSE_DEF> <EOF>
+       {return new TuringMachineDefinition(name, states, alphabet, transitions);}
+    }
+
+List<State> parseStates(State initial, State halt) :
+    {
+      final ArrayList<State> states = new ArrayList<>();
+      states.add(initial);
+    }
+    { [
+        <REF>
+        {states.add(State.state(token.image));}
+        ( <COMMA>
+          <REF>
+          {states.add(State.state(token.image));}
+          )*
+      ]
+      {
+        states.add(halt);
+        return states;
+      }
+    }
+
+List<AlphabetSymbol> parseAlphabet(AlphabetSymbol blank):
+        {
+  final ArrayList<AlphabetSymbol> alphabet = new ArrayList<>();
+}
+        { [
+            <REF>
+            {alphabet.add(AlphabetSymbol.letter(token.image));}
+            ( <COMMA>
+              <REF>
+              {alphabet.add(AlphabetSymbol.letter(token.image));}
+              )*
+          ]
+          {
+            alphabet.add(blank);
+            return alphabet;
+          }
+        }
+
+
+List<Transition> parseTransitions():
+    {
+    final ArrayList<Transition> transitions = new ArrayList<>();
+    Transition transition;
+    }
+    {
+        transition = parseTransition()
+        {transitions.add(transition);
+         transition = null;}
+        (<COMMA> transition = parseTransition()
+        {transitions.add(transition);
+         transition = null;})*
+         {return transitions;}
+    }
+
+Transition parseTransition():
+    {
+    State state;
+    State targetState;
+    AlphabetSymbol letter;
+    AlphabetSymbol targetLetter;
+    Direction direction;
+    }
+    {
+    <OPEN_PAR> state = state() <COMMA> letter = letter() <CLOSE_PAR>
+    <ARROW>
+    <OPEN_PAR> targetState = state() <COMMA>
+               targetLetter = letter() <COMMA>
+               <DIRECTION>
+               {direction = Direction.valueOf(token.image);}
+    <CLOSE_PAR>
+    {return Transition.transition(state, letter, targetState, targetLetter, direction);}
+    }
+State state():
+{}
+{<REF>
+{return State.state(token.image);}}
+
+AlphabetSymbol letter():
+{}
+{<REF>
+{return AlphabetSymbol.letter(token.image);}}

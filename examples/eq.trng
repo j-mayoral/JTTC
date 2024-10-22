@@ -1,0 +1,37 @@
+eq {
+    INITIAL_STATE: start
+    HALT_STATE: halt
+	STATES: (q0, q1, q2, q3, q4, q5, q6, q7)
+	BLANK_SYMBOL: $
+	ALPHABET: (a, b, x, eq)
+	TRANSITIONS {
+		(start, $) -> (q0, $, R),
+		(q0, a) -> (q2, x, R),
+		(q0, b) -> (q1, x, R),
+		(q0, eq) -> (q7, eq, R),
+
+		(q7, x) -> (q7, x, R),
+		(q7, $) -> (halt, $, R),
+
+		(q1, a) -> (q1, a, R),
+		(q1, b) -> (q1, b, R),
+		(q1, eq) -> (q3, eq, R),
+
+		(q3, x) -> (q3, x, R),
+		(q3, b) -> (q5, x, L),
+
+		(q5, x) -> (q5, x, L),
+		(q5, eq) -> (q6, eq, L),
+
+		(q6, a) -> (q6, a, L),
+		(q6, b) -> (q6, b, L),
+		(q6, x) -> (q0, x, R),
+
+		(q2, a) -> (q2, a, R),
+		(q2, b) -> (q2, b, R),
+		(q2, eq) -> (q4, eq, R),
+
+		(q4, x) -> (q4, x, R),
+		(q4, a) -> (q5, x, L)
+	}
+}

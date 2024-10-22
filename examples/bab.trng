@@ -1,0 +1,16 @@
+BAB {
+    INITIAL_STATE: init
+    HALT_STATE: halt
+    STATES: (q0, q1, q2)
+    BLANK_SYMBOL: $
+    ALPHABET: (a, b)
+    TRANSITIONS {
+        (init, $) -> (q0, $, R),
+        (q0, a) -> (q0, a, R),
+        (q0, b) -> (q1, b, R),
+        (q1, a) -> (q2, a, R),
+        (q1, b) -> (q1, b, R),
+        (q2, a) -> (q0, a, R),
+        (q2, b) -> (halt, b, R)
+    }
+}

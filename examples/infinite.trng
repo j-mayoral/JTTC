@@ -1,0 +1,12 @@
+infinite {
+    INITIAL_STATE: init
+    HALT_STATE: halt
+	STATES: (q1)
+	BLANK_SYMBOL: $
+	ALPHABET: (a)
+	TRANSITIONS {
+		(init, $) -> (q1, $, R),
+		(init, a) -> (q1, a, R),
+		(q1, a) -> (init, a, L)
+	}
+}
