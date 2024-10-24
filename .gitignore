@@ -1,10 +1,6 @@
 .gradle
 .idea
-build.gradle.kts
-gradle/
-gradlew
 gradlew.bat
-settings.gradle.kts
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
