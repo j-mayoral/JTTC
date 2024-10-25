@@ -20,7 +20,7 @@ public class TestUtils {
 
   public static void check(final File file, final TuringMachineDefinition tm,
       final List<AlphabetSymbol> input, final Result result) {
-    new JavaGenericCodeGenerator.ToFile(file.getPath()).apply(tm, input);
+    new JavaGenericCodeGenerator.ToFile(file.getPath()).transform(tm, input);
     boolean success = new CompilerTool(file,
       file.getPath() + "/" + tm.machineName() + ".java").compile();
     Assertions.assertEquals(result.toBool(), success);

@@ -6,8 +6,9 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public interface TransitionFunctionsCodeGenerator<T>
-  extends BiFunction<List<State>, Collection<Transition>, T> {
+public interface TransitionFunctionsCodeGenerator<T> {
+
+  public String transform(final Collection<State> states, final Collection<Transition> transitions);
 
   public static final TransitionFunctionsCodeGenerator<String> TO_STRING =
     (states, transitions) -> {

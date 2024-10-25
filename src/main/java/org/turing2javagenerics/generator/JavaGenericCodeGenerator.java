@@ -14,10 +14,12 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public interface JavaGenericCodeGenerator<T>
-  extends BiFunction<TuringMachineDefinition, List<AlphabetSymbol>, T> {
+public interface JavaGenericCodeGenerator<T> {
 
-  public static final JavaGenericCodeGenerator<Report<String>> TO_STRING_REPORT =
+  public Report<T> transform(TuringMachineDefinition def,
+    List<AlphabetSymbol> input);
+
+  public static final JavaGenericCodeGenerator<String> TO_STRING_REPORT =
     (def, input) ->
       (def.check())
         ? new Report.Ok<>(new CodeWriter(def, input).getCode())
@@ -25,10 +27,10 @@ public interface JavaGenericCodeGenerator<T>
 
   public static Report<Void> toFile(final String path,
       final TuringMachineDefinition def, final List<AlphabetSymbol> input) {
-    return new ToFile(path).apply(def, input);
+    return new ToFile(path).transform(def, input);
   }
 
-  public static class ToFile implements JavaGenericCodeGenerator<Report<Void>> {
+  public static class ToFile implements JavaGenericCodeGenerator<Void> {
 
     private final String path;
 
@@ -37,12 +39,12 @@ public interface JavaGenericCodeGenerator<T>
     }
 
     @Override
-    public Report<Void> apply(final TuringMachineDefinition def,
+    public Report<Void> transform(final TuringMachineDefinition def,
         final List<AlphabetSymbol> input) {
       final String fileName = def.machineName() + ".java";
       final String filePath = path + "/" + fileName;
       final String packageName = String.valueOf(Paths.get(path).getFileName());
-      Report<String> code = TO_STRING_REPORT.apply(def, input);
+      Report<String> code = TO_STRING_REPORT.transform(def, input);
       if (!code.isOk()) return new Report.Ko<>(code.getError());
       final String content = "package " + packageName + ";\n\n"
                                + code.get();
@@ -93,7 +95,7 @@ public interface JavaGenericCodeGenerator<T>
 
     private void transitions() {
       sb.append(
-        TransitionFunctionsCodeGenerator.TO_STRING.apply(states, transitions));
+        TransitionFunctionsCodeGenerator.TO_STRING.transform(states, transitions));
     }
 
     private void close() {
