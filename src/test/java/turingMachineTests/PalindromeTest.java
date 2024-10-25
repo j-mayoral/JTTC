@@ -1,6 +1,7 @@
 package turingMachineTests;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.turing2javagenerics.definition.AlphabetSymbol;
@@ -9,6 +10,7 @@ import org.turing2javagenerics.definition.Transition;
 import org.turing2javagenerics.definition.TuringMachineDefinition;
 import utils.TestUtils;
 
+import java.io.File;
 import java.util.List;
 
 import static org.turing2javagenerics.definition.AlphabetSymbol.letter;
@@ -25,6 +27,8 @@ import static utils.TestUtils.pair;
  */
 public class PalindromeTest {
 
+  @TempDir
+  static File tmpDir;
   private static final String machineName = "Palindrome";
 
   private static TuringMachineDefinition fromFile = null;
@@ -94,8 +98,8 @@ public class PalindromeTest {
   @ParameterizedTest
   @MethodSource("expectedPairs")
   public void test(final TestUtils.ResultPair result) {
-    TestUtils.check(TM, result.input(), result.expected());
-    TestUtils.check(fromFile, result.input(), result.expected());
+    TestUtils.check(tmpDir, TM, result.input(), result.expected());
+    TestUtils.check(tmpDir, fromFile, result.input(), result.expected());
   }
 
   @BeforeAll

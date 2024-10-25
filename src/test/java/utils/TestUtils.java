@@ -8,6 +8,7 @@ import org.turing2javagenerics.definition.AlphabetSymbol;
 import org.turing2javagenerics.definition.TuringMachineDefinition;
 import org.turing2javagenerics.generator.JavaGenericCodeGenerator;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -15,18 +16,13 @@ import java.util.List;
 
 public class TestUtils {
 
-  public static final String TRASH_PATH = "src/test/java/trash";
-
   public static final String EXAMPLE_FILES_PATH = "examples/";
 
-  public static void check(final TuringMachineDefinition tm,
+  public static void check(final File file, final TuringMachineDefinition tm,
       final List<AlphabetSymbol> input, final Result result) {
-
-    new JavaGenericCodeGenerator.ToFile(TestUtils.TRASH_PATH).apply(tm, input);
-
-    boolean success = new CompilerTool(TestUtils.TRASH_PATH,
-      TestUtils.TRASH_PATH + "/" + tm.machineName() + ".java").compile();
-
+    new JavaGenericCodeGenerator.ToFile(file.getPath()).apply(tm, input);
+    boolean success = new CompilerTool(file,
+      file.getPath() + "/" + tm.machineName() + ".java").compile();
     Assertions.assertEquals(result.toBool(), success);
   }
 

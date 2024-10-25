@@ -4,12 +4,11 @@ import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 public class CompilerTool {
 
-  private final String target;
+  private final File target;
   private final String source;
 
   private final JavaCompiler compiler;
@@ -17,7 +16,7 @@ public class CompilerTool {
   private final StandardJavaFileManager fileManager;
 
 
-  public CompilerTool(String target, String source) {
+  public CompilerTool(File target, String source) {
     this.target = target;
     this.source = source;
 
@@ -29,9 +28,8 @@ public class CompilerTool {
   public boolean compile() {
     Iterable<? extends JavaFileObject> compilationUnits = fileManager
       .getJavaFileObjectsFromPaths(List.of(Paths.get(source)));
-    File file = createDir();
     try {
-      return compile(file, compilationUnits);
+      return compile(target, compilationUnits);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -47,27 +45,6 @@ public class CompilerTool {
       null, compilationUnits);
     boolean success = task.call();
     fileManager.close();
-    deleteChildrenFiles(file);
     return success;
-  }
-
-  private File createDir() {
-    File file = new File(target);
-    file.mkdir();
-    return file;
-  }
-
-  private static void deleteChildrenFiles(File file) {
-    for (File f : file.listFiles()) deleteDir(f);
-  }
-
-  private static void deleteDir(File file) {
-    File[] contents = file.listFiles();
-    if (contents != null) {
-      for (File f : contents) {
-        deleteDir(f);
-      }
-    }
-    file.delete();
   }
 }

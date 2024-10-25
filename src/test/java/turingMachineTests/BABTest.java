@@ -1,9 +1,7 @@
 package turingMachineTests;
 
-import org.generated.ParseException;
-import org.generated.TuringMachineDefinitionParser;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.turing2javagenerics.definition.AlphabetSymbol;
@@ -12,6 +10,7 @@ import org.turing2javagenerics.definition.Transition;
 import org.turing2javagenerics.definition.TuringMachineDefinition;
 import utils.TestUtils;
 
+import java.io.File;
 import java.util.List;
 
 import static org.turing2javagenerics.definition.AlphabetSymbol.letter;
@@ -26,6 +25,9 @@ import static utils.TestUtils.pair;
  * Check if a String of as and bs contains the substring bab.
  */
 public class BABTest {
+
+  @TempDir
+  static File tmpDir;
 
   private static TuringMachineDefinition fromFile = null;
   private static final String machineName = "BAB";
@@ -71,8 +73,8 @@ public class BABTest {
   @ParameterizedTest
   @MethodSource("expectedPairs")
   public void test(final TestUtils.ResultPair expected) {
-    TestUtils.check(TM, expected.input(), expected.expected());
-    TestUtils.check(fromFile, expected.input(), expected.expected());
+    TestUtils.check(tmpDir, TM, expected.input(), expected.expected());
+    TestUtils.check(tmpDir, fromFile, expected.input(), expected.expected());
   }
 
   @BeforeAll
